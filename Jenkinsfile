@@ -20,6 +20,7 @@ pipeline {
         BRAVE_ARTIFACTS_BUCKET = credentials("brave-jenkins-artifacts-s3-bucket")
         BRAVE_S3_BUCKET = credentials("brave-binaries-s3-bucket")
         SLACK_USERNAME_MAP = credentials("github-to-slack-username-map")
+        GIT_SSH_COMMAND = "ssh -o StrictHostKeyChecking=no"
     }
     stages {
         stage("env") {
@@ -128,11 +129,9 @@ pipeline {
                                 expression { return !fileExists("src/brave/package.json") || !SKIP_INIT }
                             }
                             steps {
-                                sh """
-                                    set -e
-                                    rm -rf src/brave
-                                    npm run init -- --target_os=android
-                                """
+                                sshagent (credentials: ['brave-antibot-repo-deploy-key']) {
+                                    sh "npm run init -- --target_os=android"
+                                }
                             }
                         }
                         stage("lint") {
@@ -370,11 +369,9 @@ pipeline {
                                 expression { return !fileExists("src/brave/package.json") || !SKIP_INIT }
                             }
                             steps {
-                                sh """
-                                    set -e
-                                    rm -rf src/brave
-                                    npm run init
-                                """
+                                sshagent (credentials: ['brave-antibot-repo-deploy-key']) {
+                                    sh "npm run init"
+                                }
                             }
                         }
                         stage("lint") {
@@ -546,11 +543,9 @@ pipeline {
                                 expression { return !fileExists("src/brave/package.json") || !SKIP_INIT }
                             }
                             steps {
-                                sh """
-                                    set -e
-                                    rm -rf src/brave
-                                    npm run init
-                                """
+                                sshagent (credentials: ['brave-antibot-repo-deploy-key']) {
+                                    sh "npm run init"
+                                }
                             }
                         }
                         stage("lint") {
@@ -735,12 +730,9 @@ pipeline {
                                 expression { return !fileExists("src/brave/package.json") || !SKIP_INIT }
                             }
                             steps {
-                                powershell """
-                                    \$ErrorActionPreference = "Stop"
-                                    Remove-Item -ErrorAction SilentlyContinue -Force src/brave
-                                    git -C vendor/depot_tools clean -fxd
-                                    npm run init
-                                """
+                                sshagent (credentials: ['brave-antibot-repo-deploy-key']) {
+                                    powershell "npm run init"
+                                }
                             }
                         }
                         stage("lint") {
