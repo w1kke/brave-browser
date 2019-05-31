@@ -42,10 +42,10 @@
       },
       "brave-core": {
         "dir": "src/brave",
-        "branch": "0.66.x",
         "repository": {
           "url": "https://github.com/brave/brave-core.git"
-        }
+        },
+        "branch": "pr2558_fix_shortcut_macos_0.66.x"
       }
     },
     "widevine": {
